@@ -21,7 +21,7 @@ CFLAGS		+= -O3\
 		   -fno-common $(ARCH_FLAGS) -MD $(DEFINES)
 
 DEVICES_DATA = $(OPENCM3_DIR)/ld/devices.data
-LDSCRIPT = obj/generated.$(DEVICE).ld
+LDSCRIPT = stm32f207zg.ld
 
 LDLIBS += -l$(LIBNAME)
 LIBDEPS += $(OPENCM3_DIR)/lib/lib$(LIBNAME).a
@@ -48,13 +48,6 @@ all: test.bin
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
-
-
-
-$(LDSCRIPT): $(OPENCM3_DIR)/ld/linker.ld.S $(OPENCM3_DIR)/ld/devices.data $(CONFIG)
-	@printf "  GENLNK  $(DEVICE)\n"
-	$(Q)mkdir -p $(@D)
-	$(Q)$(CPP) $(ARCH_FLAGS) $(shell $(OPENCM3_DIR)/scripts/genlink.py $(DEVICES_DATA) $(DEVICE) DEFS) -P -E $< -o $@
 
 
 clean:
