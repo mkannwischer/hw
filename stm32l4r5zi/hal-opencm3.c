@@ -242,7 +242,7 @@ static void clock_setup(enum clock_mode clock)
 #endif
 }
 
-static void usart_setup(void)
+void usart_setup()
 {
 #if defined(DISCOVERY_BOARD)
   rcc_periph_clock_enable(RCC_GPIOA);
@@ -290,7 +290,7 @@ static void usart_setup(void)
 #endif
 }
 
-static void systick_setup(void)
+void systick_setup()
 {
   /* Systick is always the same on libopencm3 */
   systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
@@ -341,7 +341,7 @@ uint64_t hal_get_time()
 /* End of BSS is where the heap starts (defined in the linker script) */
 extern char end;
 static char* heap_end = &end;
-void* __wrap__sbrk (int incr);
+
 void* __wrap__sbrk (int incr)
 {
   char* prev_heap_end;
