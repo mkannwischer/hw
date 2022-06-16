@@ -1,3 +1,6 @@
 [submodule "stm32f207zg/libopencm3"]
 	path = stm32f207zg/libopencm3
 	url = https://github.com/libopencm3/libopencm3
+[submodule "libopencm3"]
+	path = libopencm3
+	url = https://github.com/libopencm3/libopencm3
