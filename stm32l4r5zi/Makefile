@@ -34,16 +34,16 @@ LDFLAGS += \
 	-T$(LDSCRIPT) \
 	$(ARCH_FLAGS)
 
-OBJS=hal-opencm3.o test.o
+OBJS=hal-opencm3.o hal-flash.o
 
-all: test.bin
+all: test.bin test-flash.bin
 
 
 %.bin: %.elf
 	$(OBJCOPY) -Obinary $(*).elf $(*).bin
 
 %.elf: %.o $(OBJS) $(LDSCRIPT)
-	$(LD) -o $(*).elf $(OBJS) $(LDFLAGS) -l$(LIBNAME)
+	$(LD) -o $(*).elf $(*).o $(OBJS) $(LDFLAGS) -l$(LIBNAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
