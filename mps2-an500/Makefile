@@ -6,14 +6,7 @@ OBJCOPY	= $(PREFIX)-objcopy
 OBJDUMP	= $(PREFIX)-objdump
 GDB		= $(PREFIX)-gdb
 
-
-ifeq ($(PLATFORM),stm32)
-include stm32f407.mk
-else
 include qemu.mk
-endif
-
-
 
 obj/_ELFNAME_%.o: $(LINKDEPS)
 	@echo "  GEN     $@"

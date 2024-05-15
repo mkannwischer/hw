@@ -11,7 +11,7 @@ CFLAGS += \
 	-Icommon -Icommon/mps2
 
 CPPFLAGS += \
-	-DMPS2_AN386
+	-DMPS2
 
 LDFLAGS += \
 	--specs=nosys.specs \
