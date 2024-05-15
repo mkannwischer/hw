@@ -29,12 +29,26 @@
 * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************
+* Name:    Device.h
+* Purpose: Include the correct device header file
 *******************************************************************************/
 
-#ifndef MBED_CMSIS_NVIC_H
-#define MBED_CMSIS_NVIC_H
+#ifndef __DEVICE_H
+#define __DEVICE_H
 
-#define NVIC_NUM_VECTORS        (16 + 48)
-#define NVIC_RAM_VECTOR_ADDRESS 0x20000000    // Location of vectors in RAM
-
+#if   defined CMSDK_CM0
+  #include "CMSDK_CM0.h"                         /* device specific header file */
+#elif defined CMSDK_CM0plus
+  #include "CMSDK_CM0plus.h"                     /* device specific header file */
+#elif defined CMSDK_CM3
+  #include "CMSDK_CM3.h"                         /* device specific header file */
+#elif defined CMSDK_CM4
+  #include "CMSDK_CM4.h"                         /* device specific header file */
+#elif defined CMSDK_CM7
+  #include "CMSDK_CM7.h"                         /* device specific header file */
+#else
+  #warning "no appropriate header file found!"
 #endif
+
+#endif /* __DEVICE_H */

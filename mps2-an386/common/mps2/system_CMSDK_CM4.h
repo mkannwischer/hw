@@ -29,12 +29,48 @@
 * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************/
+*
+*******************************************************************************
+* @file     system_CMSDK_CM4.h
+* @brief    CMSIS Device Peripheral Access Layer Header File for
+*           CMSDK_CM4 Device
+*
+******************************************************************************/
 
-#ifndef MBED_CMSIS_NVIC_H
-#define MBED_CMSIS_NVIC_H
 
-#define NVIC_NUM_VECTORS        (16 + 48)
-#define NVIC_RAM_VECTOR_ADDRESS 0x20000000    // Location of vectors in RAM
+#ifndef SYSTEM_CMSDK_CM4_H
+#define SYSTEM_CMSDK_CM4_H
 
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+extern uint32_t SystemCoreClock;     /*!< System Clock Frequency (Core Clock)  */
+
+
+/**
+ * Initialize the system
+ *
+ * @param  none
+ * @return none
+ *
+ * @brief  Setup the microcontroller system.
+ *         Initialize the System and update the SystemCoreClock variable.
+ */
+extern void SystemInit (void);
+
+/**
+ * Update SystemCoreClock variable
+ *
+ * @param  none
+ * @return none
+ *
+ * @brief  Updates the SystemCoreClock with current core Clock
+ *         retrieved from cpu registers.
+ */
+extern void SystemCoreClockUpdate (void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* SYSTEM_CMSDK_CM4_H */

@@ -1,8 +1,5 @@
 /*
- * MPS2 CMSIS Library
- */
-/*
- * Copyright (c) 2009-2019 ARM Limited. All rights reserved.
+ * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -18,27 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /*
- * This file is derivative of CMSIS V5.00 gcc_arm.ld
- */
-/* Linker script for mbed FVP Cortex-M on MPS2 */
-
-/* Linker script to configure memory regions. */
-/* The length of the VECTORS region is a bit larger than
- * is necessary based on the number of exception handlers.
+ * This file is derivative of mbed-os V5.10.4 CM3DS MPS2.ld for GCC_ARM
+ *
+ * Linker script for AN386
  */
 
-#include "memory_zones.h"
 #include "cmsis_nvic.h"
-
-#if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
-    #define MBED_CONF_TARGET_BOOT_STACK_SIZE 0x400
-#endif
 
 MEMORY
 {
-  FLASH (rx)            : ORIGIN = ZBT_SRAM1_START, LENGTH = ZBT_SRAM1_SIZE
-  RAM (rwx)             : ORIGIN = ZBT_SRAM2_START, LENGTH = ZBT_SRAM2_SIZE
+  FLASH (rx)            : ORIGIN = 0x00000000, LENGTH = 0x00400000    /* 4MB  ZBTSRAM1 */
+  RAM (rwx)             : ORIGIN = 0x20000000, LENGTH = 0x00400000    /* 4MB  ZBTSRAM2 & ZBTSRAM3 */
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -69,10 +58,11 @@ MEMORY
  */
 ENTRY(Reset_Handler)
 
-STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
+HEAP_SIZE  = 0x1000;
+STACK_SIZE = 0x400;
 
 /* Size of the vector table in SRAM */
-M_VECTOR_RAM_SIZE = NVIC_VECTORS_SIZE;
+M_VECTOR_RAM_SIZE = NVIC_NUM_VECTORS * 4;
 
 SECTIONS
 {
@@ -80,12 +70,12 @@ SECTIONS
     {
         __vector_table = .;
         KEEP(*(.vector_table))
-         . = ALIGN(8);
+         . = ALIGN(4);
     } > FLASH
 
     .text :
     {
-        . = ALIGN(8);
+        . = ALIGN(4);
         *(.text*)
 
         KEEP(*(.init))
@@ -122,24 +112,31 @@ SECTIONS
     } > FLASH
     __exidx_end = .;
 
+    .interrupts_ram :
+    {
+        . = ALIGN(4);
+        __VECTOR_RAM__ = .;
+        __interrupts_ram_start__ = .;   /* Create a global symbol at data start */
+        . += M_VECTOR_RAM_SIZE;
+        . = ALIGN(4);
+        __interrupts_ram_end__ = .;     /* Define a global symbol at data end */
+    } > RAM
+
     .data :
     {
-#ifndef DATA_IN_FLASH
         PROVIDE(__etext = LOADADDR(.data));
-        . = ALIGN(8);
-#endif
+        . = ALIGN(4);
         __data_start__ = .;
         *(vtable)
-        *(.data)
         *(.data*)
 
-        . = ALIGN(8);
+        . = ALIGN(4);
         /* preinit data */
         PROVIDE (__preinit_array_start = .);
         KEEP(*(.preinit_array))
         PROVIDE (__preinit_array_end = .);
 
-        . = ALIGN(8);
+        . = ALIGN(4);
         /* init data */
         PROVIDE (__init_array_start = .);
         KEEP(*(SORT(.init_array.*)))
@@ -147,51 +144,51 @@ SECTIONS
         PROVIDE (__init_array_end = .);
 
 
-        . = ALIGN(8);
+        . = ALIGN(4);
         /* finit data */
         PROVIDE (__fini_array_start = .);
         KEEP(*(SORT(.fini_array.*)))
         KEEP(*(.fini_array))
         PROVIDE (__fini_array_end = .);
 
-        . = ALIGN(8);
+        . = ALIGN(4);
         /* All data end */
         __data_end__ = .;
 
-#ifdef DATA_IN_FLASH
-    } > FLASH
-#else
     } > RAM AT > FLASH
-#endif
+
+    .uninitialized (NOLOAD):
+    {
+        . = ALIGN(32);
+        __uninitialized_start = .;
+        *(.uninitialized)
+        KEEP(*(.keep.uninitialized))
+        . = ALIGN(32);
+        __uninitialized_end = .;
+    } > RAM
 
     .bss :
     {
-        . = ALIGN(8);
+        . = ALIGN(4);
         __START_BSS = .;
         __bss_start__ = .;
-        *(.bss)
         *(.bss*)
         *(COMMON)
-        . = ALIGN(8);
+        . = ALIGN(4);
         __bss_end__ = .;
         __END_BSS = .;
 
-#ifdef DATA_IN_FLASH
-    } > FLASH
-#else
     } > RAM
-#endif
 
     bss_size = __bss_end__ - __bss_start__;
 
-    .heap (COPY):
+    .heap :
     {
         . = ALIGN(8);
         __end__ = .;
         PROVIDE(end = .);
         __HeapBase = .;
-        *(.heap*)
-        . = ORIGIN(RAM) + LENGTH(RAM) - STACK_SIZE;
+        . += HEAP_SIZE;
         __HeapLimit = .;
         __heap_limit = .; /* Add for _sbrk */
     } > RAM

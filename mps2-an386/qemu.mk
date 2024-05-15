@@ -2,7 +2,6 @@
 all: bin/qemu-test.bin
 
 OBJS=obj/test.c.o
-MPS2_DATA_IN_FLASH = 1
 LDSCRIPT = obj/ldscript.ld
 ARCH_FLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
@@ -30,8 +29,6 @@ LIBHAL_SRC := \
 objs = $(addprefix obj/,$(addsuffix .o,$(1)))
 obj/libpqm4hal.a: $(call objs,$(LIBHAL_SRC))
 obj/libpqm4hal.a: CPPFLAGS += -Icommon/mps2
-$(LDSCRIPT): CPPFLAGS += $(if $(MPS2_DATA_IN_FLASH),-DDATA_IN_FLASH)
-obj/common/mps2/startup_MPS2.S.o: CFLAGS += -DDATA_IN_FLASH
 
 LDLIBS += -lpqm4hal$(if $(NO_RANDOMBYTES),-nornd)
 LIBDEPS += obj/libpqm4hal.a
@@ -52,4 +49,3 @@ QEMUFLAGS = -M mps2-an386 -nographic -semihosting
 
 run-qemu: bin/qemu-test.bin
 	$(QEMU) $(QEMUFLAGS) -kernel bin/qemu-test.bin
-

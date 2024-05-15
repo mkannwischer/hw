@@ -29,12 +29,15 @@
 * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************
+* A generic CMSIS include header, pulling in MPS2 specifics
 *******************************************************************************/
 
-#ifndef MBED_CMSIS_NVIC_H
-#define MBED_CMSIS_NVIC_H
+#ifndef MBED_CMSIS_H
+#define MBED_CMSIS_H
 
-#define NVIC_NUM_VECTORS        (16 + 48)
-#define NVIC_RAM_VECTOR_ADDRESS 0x20000000    // Location of vectors in RAM
+#include "CMSDK_CM4.h"
+#include "SMM_MPS2.h"
+#include "cmsis_nvic.h"
 
 #endif
