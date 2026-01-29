@@ -17,7 +17,12 @@
 #ifndef _UART_STDOUT_H_
 #define _UART_STDOUT_H_
 
-#include "common.h"
+#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef TRUE
+#define TRUE 1
+#endif
 
 /* Functions for stdout during simulation */
 /* The functions are implemented in uart_stdout.c */

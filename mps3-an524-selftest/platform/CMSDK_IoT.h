@@ -190,7 +190,7 @@ typedef enum IRQn
 #define __NVIC_PRIO_BITS          2        /* Number of Bits used for Priority Levels */
 #define __Vendor_SysTickConfig    0        /* Set to 1 if different SysTick Config is used */
 
-#include "core_armv8mbl.h"                    /* Processor and core peripherals                  */
+#include "core_armv8mml.h"                    /* Processor and core peripherals (Cortex-M33)     */
 #include "system_CMSDK_IoT.h"                 /* System Header                                   */
 
 /* ================================================================================ */

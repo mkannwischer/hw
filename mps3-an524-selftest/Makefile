@@ -1,70 +1,49 @@
-# Makefile for MPS3-AN524 using AN524 selftest code
-# Uses GCC toolchain
+# Makefile for MPS3-AN524
 
-CROSS_PREFIX ?= arm-none-eabi
-CC = $(CROSS_PREFIX)-gcc
-AS = $(CROSS_PREFIX)-gcc
-LD = $(CROSS_PREFIX)-gcc
-OBJCOPY = $(CROSS_PREFIX)-objcopy
-SIZE = $(CROSS_PREFIX)-size
+CFLAGS += \
+	-O2 \
+	-Wall -Wextra -Wshadow \
+	-MMD \
+	-fno-common \
+	-ffunction-sections \
+	-fdata-sections \
+	$(CPPFLAGS)
 
-# Architecture flags - Cortex-M33, soft float (no FPU needed)
-ARCH_FLAGS = -mcpu=cortex-m33 -mthumb -mfloat-abi=soft
+LDFLAGS += \
+	-Wl,--gc-sections \
+	-L.
 
-# Compiler flags
-CFLAGS = $(ARCH_FLAGS)
-CFLAGS += -DFPGA_IMAGE
-CFLAGS += -Iplatform
-CFLAGS += -O2
-CFLAGS += -Wall
-CFLAGS += -ffunction-sections -fdata-sections
-CFLAGS += --specs=nosys.specs
+LDLIBS += -lhal
+LIBDEPS = libhal.a
 
-# Assembler flags
-ASFLAGS = $(ARCH_FLAGS)
-ASFLAGS += --specs=nosys.specs
+OBJS = test.c.o
 
-# Linker flags
-LDFLAGS = $(ARCH_FLAGS)
-LDFLAGS += -Tplatform/mps3.ld
-LDFLAGS += -Wl,--gc-sections
-LDFLAGS += --specs=nosys.specs
-LDFLAGS += -nostartfiles
+all: test.elf
 
-# Source files
-SRCS = test.c
-SRCS += platform/system_CMSDK_IoT.c
-SRCS += platform/uart_stdout.c
-SRCS += platform/retarget.c
+objs = $(addsuffix .o,$(1))
+PLATFORM ?= mps3-an524
+include platform/$(PLATFORM).mk
 
-ASM_SRCS = platform/startup_CMSDK_IoT.S
+run: test.elf
+	qemu-system-arm -M mps3-an524 -nographic -semihosting -kernel $<
 
-# Object files
-OBJS = $(SRCS:.c=.o)
-OBJS += $(ASM_SRCS:.S=.o)
+%.elf: %.c.o $(OBJS) $(LDSCRIPT) $(LIBDEPS)
+	$(LD) $(LDFLAGS) -o $@ $(OBJS) -Wl,--start-group $(LDLIBS) -Wl,--end-group
 
-# Target
-TARGET = test
+%.a:
+	@echo "  AR      $@"
+	$(AR) rcs $@ $(filter %.o,$^)
 
-all: $(TARGET).elf $(TARGET).bin
-	$(SIZE) $(TARGET).elf
+%.c.o: %.c
+	@echo "  CC      $@"
+	$(CC) -c -o $@ $(CFLAGS) $<
 
-$(TARGET).elf: $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+%.S.o: %.S
+	@echo "  AS      $@"
+	$(CC) -c -o $@ $(CFLAGS) $<
 
-$(TARGET).bin: $(TARGET).elf
-	$(OBJCOPY) -O binary $< $@
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-%.o: %.S
-	$(AS) $(ASFLAGS) -c -o $@ $<
-
+.PHONY: clean
 clean:
-	rm -f $(OBJS) $(TARGET).elf $(TARGET).bin
+	rm -rf *.o *.d platform/*.o platform/*.d *.elf *.bin *.a
 
-run: $(TARGET).elf
-	qemu-system-arm -M mps3-an524 -nographic -kernel $<
-
-.PHONY: all clean run
+-include $(OBJS:.o=.d)

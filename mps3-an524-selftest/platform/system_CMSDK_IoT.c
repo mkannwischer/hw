@@ -101,3 +101,22 @@ void SystemInit (void)
 
   SystemCoreClock = __SYSTEM_CLOCK;
 }
+
+/*----------------------------------------------------------------------------
+  _write wrapper for printf support
+ *----------------------------------------------------------------------------*/
+#include <errno.h>
+extern unsigned char UartPutc(unsigned char my_ch);
+
+int __wrap__write(int file, char *ptr, int len)
+{
+    if (file == 1 || file == 2) {
+        for (int i = 0; i < len; i++) {
+            UartPutc(ptr[i]);
+        }
+        errno = 0;
+        return len;
+    }
+    errno = ENOSYS;
+    return -1;
+}
